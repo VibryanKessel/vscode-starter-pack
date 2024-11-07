@@ -31,5 +31,4 @@ if exist previous-extensions.txt (
 rem Push changes to the remote repository
 git push origin master
 
-rem Update previous extensions file
 copy %EXTENSIONS_LIST% previous-extensions.txt

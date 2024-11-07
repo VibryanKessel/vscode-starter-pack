@@ -2,7 +2,7 @@
 
 # Import extensions from the list in vscode-extensions.txt
 
-EXTENSIONS_LIST="vscode-extensions.txt"
+EXTENSIONS_LIST="../vscode-extensions.txt"
 
 # Check if the file with extensions exists
 if [ ! -f "$EXTENSIONS_LIST" ]; then
