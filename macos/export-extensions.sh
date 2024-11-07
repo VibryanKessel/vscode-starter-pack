@@ -1,38 +1,37 @@
 #!/bin/bash
 
-# Export the list of installed extensions in VSCode to a file
+# Path for the extensions list file in the root of the repo
 EXTENSIONS_LIST="../vscode-extensions.txt"
 
-# Get a list of currently installed extensions
+# Get the list of currently installed extensions
 INSTALLED_EXTENSIONS=$(code --list-extensions)
 
-# Write the list to the extensions file
+# Write the list to the extensions file at the root of the repo
 echo "$INSTALLED_EXTENSIONS" > "$EXTENSIONS_LIST"
 
-# Check for changes between current and previous extensions
-if [ -f "previous-extensions.txt" ]; then
-    # Compare the old and new extension lists
-    ADDED_EXTENSIONS=$(comm -13 <(sort previous-extensions.txt) <(sort "$EXTENSIONS_LIST"))
-    REMOVED_EXTENSIONS=$(comm -23 <(sort previous-extensions.txt) <(sort "$EXTENSIONS_LIST"))
+# Ensure we're in the root directory of the repo
+cd "$(dirname "$0")/.."
 
-    # Commit changes (additions or removals)
-    if [ -n "$ADDED_EXTENSIONS" ]; then
-        echo "Extensions added: $ADDED_EXTENSIONS"
-        git add "$EXTENSIONS_LIST"
-        git commit -m "Added extensions: $ADDED_EXTENSIONS"
-    fi
+# Pull the latest version of the vscode-extensions.txt from the remote repository to compare
+git fetch origin
+git checkout origin/master -- "$EXTENSIONS_LIST"
 
-    if [ -n "$REMOVED_EXTENSIONS" ]; then
-        echo "Extensions removed: $REMOVED_EXTENSIONS"
-        git add "$EXTENSIONS_LIST"
-        git commit -m "Removed extensions: $REMOVED_EXTENSIONS"
-    fi
-else
-    echo "No previous extensions file found. Skipping comparison."
+# Compare the current extensions list with the one from the remote repository
+ADDED_EXTENSIONS=$(comm -13 <(sort "$EXTENSIONS_LIST") <(sort "$EXTENSIONS_LIST"))
+REMOVED_EXTENSIONS=$(comm -23 <(sort "$EXTENSIONS_LIST") <(sort "$EXTENSIONS_LIST"))
+
+# Commit the changes (additions or removals)
+if [ -n "$ADDED_EXTENSIONS" ]; then
+    echo "Extensions added: $ADDED_EXTENSIONS"
+    git add "$EXTENSIONS_LIST"
+    git commit -m "Added extensions: $ADDED_EXTENSIONS"
 fi
 
-# Push changes to the remote repository
-git push origin master
+if [ -n "$REMOVED_EXTENSIONS" ]; then
+    echo "Extensions removed: $REMOVED_EXTENSIONS"
+    git add "$EXTENSIONS_LIST"
+    git commit -m "Removed extensions: $REMOVED_EXTENSIONS"
+fi
 
-# Update previous extensions file for future comparisons
-cp "$EXTENSIONS_LIST" previous-extensions.txt
+# Push the changes to the remote repository
+git push origin master

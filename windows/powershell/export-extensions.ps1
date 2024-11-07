@@ -1,38 +1,35 @@
-# Export VSCode extensions to a file
+# Path for the extensions list file
 $extensionsList = "../vscode-extensions.txt"
 
 # Get the list of installed extensions
 $installedExtensions = code --list-extensions
 
-# Save the extensions list to a file
+# Save the extensions list to a file at the root of the repo
 $installedExtensions | Out-File -FilePath $extensionsList
 
-# Check for changes in extensions
-if (Test-Path "previous-extensions.txt") {
-    $previousExtensions = Get-Content "previous-extensions.txt"
-    
-    # Compare the old and new extensions
-    $addedExtensions = Compare-Object -ReferenceObject $previousExtensions -DifferenceObject $installedExtensions | Where-Object {$_.SideIndicator -eq "=>"} | ForEach-Object { $_.InputObject }
-    $removedExtensions = Compare-Object -ReferenceObject $previousExtensions -DifferenceObject $installedExtensions | Where-Object {$_.SideIndicator -eq "<="} | ForEach-Object { $_.InputObject }
+# Ensure we're in the root directory of the repo
+Set-Location -Path (Resolve-Path "..")
 
-    # Commit the changes (added or removed extensions)
-    if ($addedExtensions) {
-        Write-Host "Extensions added: $addedExtensions"
-        git add $extensionsList
-        git commit -m "Added extensions: $addedExtensions"
-    }
+# Fetch the latest version of the file from the remote repository for comparison
+git fetch origin
+git checkout origin/master -- $extensionsList
 
-    if ($removedExtensions) {
-        Write-Host "Extensions removed: $removedExtensions"
-        git add $extensionsList
-        git commit -m "Removed extensions: $removedExtensions"
-    }
-} else {
-    Write-Host "No previous extensions file found. Skipping comparison."
+# Compare the new extensions with the remote version
+$addedExtensions = Compare-Object -ReferenceObject (Get-Content $extensionsList) -DifferenceObject $installedExtensions | Where-Object {$_.SideIndicator -eq "=>"} | ForEach-Object { $_.InputObject }
+$removedExtensions = Compare-Object -ReferenceObject (Get-Content $extensionsList) -DifferenceObject $installedExtensions | Where-Object {$_.SideIndicator -eq "<="} | ForEach-Object { $_.InputObject }
+
+# Commit the changes (added or removed extensions)
+if ($addedExtensions) {
+    Write-Host "Extensions added: $addedExtensions"
+    git add $extensionsList
+    git commit -m "Added extensions: $addedExtensions"
 }
 
-# Push changes to the remote repository
-git push origin master
+if ($removedExtensions) {
+    Write-Host "Extensions removed: $removedExtensions"
+    git add $extensionsList
+    git commit -m "Removed extensions: $removedExtensions"
+}
 
-# Update previous extensions file
-Copy-Item -Path $extensionsList -Destination "previous-extensions.txt"
+# Push the changes to the remote repository
+git push origin master
