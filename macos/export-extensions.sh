@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Path for the extensions list file in the root of the repo
-EXTENSIONS_LIST="../vscode-extensions.txt"
+EXTENSIONS_LIST="../../vscode-extensions.txt"
 
 # Get the list of currently installed extensions
 INSTALLED_EXTENSIONS=$(code --list-extensions)

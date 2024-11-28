@@ -1,7 +1,7 @@
 @echo off
 
 rem Path for the extensions list file
-set EXTENSIONS_LIST=..\vscode-extensions.txt
+set EXTENSIONS_LIST=..\..\vscode-extensions.txt
 
 rem Ensure we're working in the root directory of the repo
 cd /d "%~dp0..\"

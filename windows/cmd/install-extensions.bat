@@ -2,7 +2,7 @@
 
 rem Import extensions from the list in vscode-extensions.txt
 
-set EXTENSIONS_LIST=vscode-extensions.txt
+set EXTENSIONS_LIST=../../vscode-extensions.txt
 
 rem Check if the file exists
 if not exist %EXTENSIONS_LIST% (

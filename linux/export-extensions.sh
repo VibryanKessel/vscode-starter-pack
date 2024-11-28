@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Export the list of installed extensions in VSCode to a file
-EXTENSIONS_LIST="../vscode-extensions.txt"
+EXTENSIONS_LIST="../../vscode-extensions.txt"
 
 # Get a list of currently installed extensions
 INSTALLED_EXTENSIONS=$(code --list-extensions)
