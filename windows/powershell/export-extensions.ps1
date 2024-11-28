@@ -1,5 +1,5 @@
 # Path for the extensions list file
-$extensionsList = "../vscode-extensions.txt"
+$extensionsList = "../../vscode-extensions.txt"
 
 # Get the list of installed extensions
 $installedExtensions = code --list-extensions
